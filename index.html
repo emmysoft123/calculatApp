@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="index.css" rel="stylesheet">
+<script defer src="index.js"></script>
+<title>calculator app</title>
+<style>
+*,*::before, *::after{
+    box-sizing:border-box;
+}
+:root{
+    --hue-neutral: 200;
+    --hue-wrong:0;
+    --hue-correct: 145;
+}
+body{
+    --hue: var(--hue-neutral);
+    padding-top:40px;
+    margin:0;
+    display:flex;
+    width:100vw;
+    height:100vw;
+    justify-content: center;
+    align-items:center;
+    background-color: #5B25B3;
+}
+body.correct {
+    --hue: var(--hue-correct ); 
+}
+body.wrong{
+    --hue: var(--hue-wrong);
+}
+.container{
+    width:500px;
+    max-width:80%;
+    background-color: white;
+    border-radius:5px;
+    padding:10px;
+    box-shadow: 0 0 10px 2px;
+    align-content:center;
+    padding-left:30px;
+}
+.btn-grid{
+    display:grid; 
+    grid-template-columns:repeat(2, auto);
+    gap:10px;
+    margin: 20px 0; 
+}
+.btn{
+    --hue: var(--hue-neutral); 
+    border:1px solid hsl(var(--hue), 100%, 50%);
+    background-color: hsl(var(--hue), 100%,50%);
+    border-radius:0px 15px 15px 15px;
+    padding:5px 10px;
+    color:white;
+    outline:none;
+}
+.btn:hover{
+    border-color: black;
+}
+.btn.correct{
+    --hue: var(--hue-correct);
+    color:black;
+}
+.btn.wrong{
+    --hue:var(--hue-wrong);
+}
+.start-btn, .next-btn{
+    font-size:1.5rem;
+    font-weight:bold;
+    padding:10px 20px; 
+}
+.controls{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.hide{
+    display:none;
+}
+
+ 
+</style>
+</head>
+<body >
+<div class="container">
+<div id="question-container" class="hide"> 
+<div id="question">Question</div>
+<div id="answer-buttons" class="btn-grid">
+<button class="btn " >Answer 1 </button>
+<button class="btn"  >Answer 2 </button>
+ <button class="btn">Answer 3 </button>
+ <button class="btn">Answer 4 </button>
+ </div>
+ </div>
+<div class="controls">
+<button id="start-btn" class="start-btn btn">Start</button>
+<button id="next-btn" class="next-btn btn hide">Next</button>
+
+
+
+</div>
+<center id="msg"></center>
+
+</div>
+<script>
+const startButton = document.getElementById('start-btn')
+const nextButton = document.getElementById('next-btn')
+const questionContainerElement = document.getElementById('question-container')
+const questionElement = document.getElementById('question')
+const answerButtonsElement = document.getElementById('answer-buttons')
+
+/*question counter*/
+var counter=0; 
+function quesCounter(){
+  counter++;
+}
+
+
+let shuffledQuestions, currentQuestionIndex
+startButton.addEventListener('click', startGame)
+nextButton.addEventListener( 'click', () => {
+    currentQuestionIndex++
+    setNextQuestion()
+})
+
+
+    
+
+
+function startGame(){
+    console.log('Started')
+    startButton.classList.add('hide')
+    shuffledQuestions  = questions.sort(() => Math.random() - .5)
+    currentQuestionIndex = 0
+    questionContainerElement.classList.remove('hide')
+    setNextQuestion()
+  
+
+} 
+
+
+function setNextQuestion(){
+    resetState()
+    showQuestion(shuffledQuestions[currentQuestionIndex])
+
+
+    
+}
+function showQuestion(question){ 
+    questionElement.innerText = question.question
+    question.answers.forEach(answer => {
+        const button = document.createElement('button')
+        button.innerText = answer.text
+        button.classList.add('btn')
+        if(answer.correct){
+           
+            button.dataset.correct = answer.correct
+           
+
+
+        }
+        button.addEventListener('click',selectAnswer)
+        answerButtonsElement.appendChild(button)
+
+
+    })
+ 
+}
+function resetState(){
+    clearStatusClass(document.body)
+    nextButton.classList.add('hide')
+    while (answerButtonsElement.firstChild){
+        answerButtonsElement.removeChild
+        (answerButtonsElement.firstChild)
+    }
+    
+
+}
+
+function selectAnswer(e){
+    const selectedButton = e.target
+    const correct = selectedButton.dataset.correct
+    setStatusClass(document.body, correct)
+    Array.from(answerButtonsElement.children).forEach(button =>{
+        setStatusClass(button, button.dataset.correct)
+
+    })
+
+    if (shuffledQuestions.length > currentQuestionIndex + 1){
+          nextButton.classList.remove('hide')
+          quesCounter()
+        document.getElementById("msg").innerHTML="Attempted:" + counter
+    }
+    else{
+        startButton.innerText = 'Restart'
+        startButton.classList.remove('hide')
+        document.getElementById("msg").innerHTML="Attempted:" + counter
+        
+        counter=0;
+    }
+    
+ 
+}
+function setStatusClass(element, correct){
+    clearStatusClass(element)
+    if(correct){
+        element.classList.add('correct')
+        element.setAttribute('disabled','disabled');
+        
+    }else{
+        element.classList.add('wrong')
+    }
+
+}
+function clearStatusClass(element){
+    element.classList.remove('correct')
+    element.classList.remove('wrong')
+    document.getElementById("msg").innerHTML=" "
+
+
+} 
+const questions = [
+{
+   question: "what is a baby Frog called?",
+   answers: [
+   { text: "Froglet", correct: false},
+   {text: "Tadpole",correct:true},
+   { text: "Babyfrog", correct: false},
+   { text: "takpole", correct: false},
+  
+ 
+] 
+},
+
+{
+   question: "where does a pig live?",
+   answers: [
+   { text: "sty", correct: true},
+   {text: "cage",correct:false},
+   { text: "House", correct: false},
+   { text: "Pen", correct: false},
+] 
+},
+
+{
+    question: "which country does volley originate from?",
+   answers: [
+   { text: "Germany", correct: false},
+   {text: "USA",correct:true},
+   { text: "Russia", correct: false},
+   { text: "Canada", correct: false},
+] 
+},
+{
+    question: "How many players are there in an ice hockey game",
+   answers: [
+   { text: "Eleven", correct: false},
+   {text: "Eight",correct:false},
+   { text: "six", correct: true},
+   { text: "Seven", correct: false},
+] 
+},
+{
+    question: "How many straight edges does a cube have?",
+   answers: [
+   { text: "Ten", correct: false},
+   {text: "Six",correct:false},
+   { text: "Eleven", correct: false},
+   { text: "Twelve", correct: true}
+] 
+},
+]
+
+
+
+</script>
+</body>
+</html>
